@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Gomoku - Five in a row" Height="640" Width="930">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3.7*" MaxWidth="735"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <!--#region Chess board-->
+        <Border BorderThickness="2"  BorderBrush="#FF598CBF" Margin="10,10,0,10">
+            <Canvas x:Name="cvChessBoard" Background="#FF598CBF" Margin="0" SizeChanged="chessBoard_SizeChanged" MouseLeftButtonDown="cvChessBoard_MouseLeftButtonDown"/>
+        </Border>
+        <!--#endregion-->
+
     </Grid>
 </Window>

@@ -24,5 +24,15 @@ namespace Gomoku
         {
             InitializeComponent();
         }
+
+        private void cvChessBoard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show(cvChessBoard.ActualHeight.ToString() + " " + cvChessBoard.ActualWidth.ToString());
+        }
+
+        private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+        }
     }
 }
