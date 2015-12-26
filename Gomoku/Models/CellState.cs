@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gomoku.Models
 {
-    public enum CellSate
+    public enum CellState
     {
         none,
         black,
