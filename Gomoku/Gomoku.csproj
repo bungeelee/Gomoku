@@ -86,7 +86,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\CellSate.cs" />
+    <Compile Include="Models\CellState.cs" />
     <Compile Include="Models\ChessBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
