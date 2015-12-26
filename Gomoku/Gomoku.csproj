@@ -88,6 +88,8 @@
   <ItemGroup>
     <Compile Include="Models\CellState.cs" />
     <Compile Include="Models\ChessBoard.cs" />
+    <Compile Include="Models\Machine.cs" />
+    <Compile Include="Models\SimpleMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

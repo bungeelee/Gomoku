@@ -78,7 +78,6 @@ namespace Gomoku.Models
             return count;
         }
 
-
         public IEnumerable<Point> EnumerateCells()
         {
             for (int y = 0; y < gameSize; y++)
