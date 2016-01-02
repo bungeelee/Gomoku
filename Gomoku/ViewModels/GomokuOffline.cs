@@ -13,6 +13,10 @@ namespace Gomoku.ViewModels
 {
     public class GomokuOffline: GomokuGame
     {
+        public event PlayerWinHandler OnPlayerWin;
+        public delegate void PlayerWinHandler(CellState player);
+
+
         public GomokuOffline()
         {
             this.gameSize = 12;
@@ -35,23 +39,10 @@ namespace Gomoku.ViewModels
 
             double row = pos.X / x;
             double col = pos.Y / y;
-            //Calculate position current click
-            int chessManPos = (int)row + (int)col * gameSize;
-            if (chessManPos > gameSize * gameSize || chessManPos < 0) return false;
-            //Add chessman to chessBoard
-            Grid temp = (Grid)chessBoard.Children[chessManPos];
-            Ellipse chessMan = new Ellipse();
-            if (activePlayer == CellState.black)
-                chessMan.Fill = Brushes.Black;
-            else
-                chessMan.Fill = Brushes.Red;
-            if (temp.Children.Count != 0) return false;
 
             if (board.GetChessman((int)row, (int)col) == CellState.none)
             {
-                temp.Children.Add(chessMan);
-                chessBoard.Children[chessManPos] = temp;
-
+                DrawChessman(chessBoard, (int)row, (int)col);
                 board.SetChessman(activePlayer, (int)row, (int)col);
 
                 if (board.CountPlayerItem((int)row, (int)col, 1, 0, activePlayer) >= 5
@@ -59,8 +50,8 @@ namespace Gomoku.ViewModels
                     || board.CountPlayerItem((int)row, (int)col, 1, 1, activePlayer) >= 5
                     || board.CountPlayerItem((int)row, (int)col, 1, -1, activePlayer) >= 5)
                 {
-                    isGameEnded = true;
-                    MessageBox.Show(activePlayer.ToString());
+                    if (OnPlayerWin != null)
+                        OnPlayerWin(player: activePlayer);
                     return true;
                 }
             }
@@ -68,39 +59,20 @@ namespace Gomoku.ViewModels
         }
 
         //For machine
-        public override bool PlayAt(Canvas chessBoard, int X, int Y)
+        public override bool PlayAt(Canvas chessBoard, int row, int col)
         {
-            double x = chessBoard.ActualWidth / gameSize;
-            double y = chessBoard.ActualHeight / gameSize;
-
-            double row = X;
-            double col = Y;
-            //Calculate position current click
-            int chessManPos = (int)row + (int)col * gameSize;
-
-            //Add chessman to chessBoard
-            Grid temp = (Grid)chessBoard.Children[chessManPos];
-            Ellipse chessMan = new Ellipse();
-            if (activePlayer == CellState.black)
-                chessMan.Fill = Brushes.Black;
-            else
-                chessMan.Fill = Brushes.Red;
-            if (temp.Children.Count != 0) return true;
-
-            if (board.GetChessman((int)row, (int)col) == CellState.none)
+            if (board.GetChessman(row, col) == CellState.none)
             {
-                temp.Children.Add(chessMan);
-                chessBoard.Children[chessManPos] = temp;
+                DrawChessman(chessBoard, row, col);
 
-                board.SetChessman(activePlayer, (int)row, (int)col);
-
-                if (board.CountPlayerItem((int)row, (int)col, 1, 0, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 0, 1, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 1, 1, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 1, -1, activePlayer) >= 5)
+                board.SetChessman(activePlayer, row, col);
+                if (board.CountPlayerItem(row, col, 1, 0, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 0, 1, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 1, 1, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 1, -1, activePlayer) >= 5)
                 {
-
-                    MessageBox.Show(activePlayer.ToString());
+                    if (OnPlayerWin != null)
+                        OnPlayerWin(player: activePlayer);
                     return true;
                 }
                 if (activePlayer == CellState.black)
@@ -109,6 +81,8 @@ namespace Gomoku.ViewModels
             }
             return true;
         }
+
+
 
     }
 }

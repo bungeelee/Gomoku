@@ -7,6 +7,7 @@ using Gomoku.Models;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace Gomoku.ViewModels
 {
@@ -16,6 +17,7 @@ namespace Gomoku.ViewModels
         public ChessBoard board { get; set; }
         public CellState activePlayer;
         public bool isGameEnded { get; set; }
+
 
         /// <summary>
         /// Draw chess board
@@ -108,10 +110,29 @@ namespace Gomoku.ViewModels
             }
         }
 
+        public void DrawChessman(Canvas chessBoard, int row, int col)
+        {
+            //Calculate position current click
+            int chessManPos = (int)row + (int)col * gameSize;
+
+            Grid temp = (Grid)chessBoard.Children[chessManPos];
+            //Chessman
+            Ellipse chessMan = new Ellipse();
+            if (activePlayer == CellState.black)
+                chessMan.Fill = Brushes.Black;
+            else
+                chessMan.Fill = Brushes.Red;
+
+            temp.Children.Add(chessMan);
+            chessBoard.Children[chessManPos] = temp;
+            
+        }
 
         public abstract bool PlayAt(Canvas chesboard, Point pos);
 
         public abstract bool PlayAt(Canvas chessBoard, int X, int Y);
+
+
 
     }
 }

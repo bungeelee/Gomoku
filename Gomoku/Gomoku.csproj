@@ -73,6 +73,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\GomokuGame.cs" />
+    <Compile Include="ViewModels\GomokuOffline.cs" />
     <Page Include="GomokuWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
