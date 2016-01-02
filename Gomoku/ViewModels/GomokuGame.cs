@@ -18,7 +18,6 @@ namespace Gomoku.ViewModels
         public CellState activePlayer;
         public bool isGameEnded { get; set; }
 
-
         /// <summary>
         /// Draw chess board
         /// </summary>
@@ -110,6 +109,12 @@ namespace Gomoku.ViewModels
             }
         }
 
+        /// <summary>
+        /// Draw chessman to chessboard
+        /// </summary>
+        /// <param name="chessBoard"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
         public void DrawChessman(Canvas chessBoard, int row, int col)
         {
             //Calculate position current click
@@ -125,7 +130,6 @@ namespace Gomoku.ViewModels
 
             temp.Children.Add(chessMan);
             chessBoard.Children[chessManPos] = temp;
-            
         }
 
         public abstract bool PlayAt(Canvas chesboard, Point pos);

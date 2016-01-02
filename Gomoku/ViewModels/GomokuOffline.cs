@@ -13,6 +13,7 @@ namespace Gomoku.ViewModels
 {
     public class GomokuOffline: GomokuGame
     {
+
         public event PlayerWinHandler OnPlayerWin;
         public delegate void PlayerWinHandler(CellState player);
 
@@ -24,6 +25,7 @@ namespace Gomoku.ViewModels
             activePlayer = CellState.black;
 
         }
+
         public GomokuOffline(int gameSize)
         {
             this.gameSize = gameSize;
@@ -54,6 +56,10 @@ namespace Gomoku.ViewModels
                         OnPlayerWin(player: activePlayer);
                     return true;
                 }
+                //Change turn to next player
+                if (activePlayer == CellState.black)
+                    activePlayer = CellState.red;
+                else activePlayer = CellState.black;
             }
             return true;
         }
@@ -75,11 +81,18 @@ namespace Gomoku.ViewModels
                         OnPlayerWin(player: activePlayer);
                     return true;
                 }
+                //change turn to next player
                 if (activePlayer == CellState.black)
                     activePlayer = CellState.red;
                 else activePlayer = CellState.black;
             }
-            return true;
+            return false;
+        }
+
+        //Send message
+        public void SendMessage()
+        {
+
         }
 
 
