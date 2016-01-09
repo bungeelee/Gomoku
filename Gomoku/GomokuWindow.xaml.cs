@@ -36,8 +36,28 @@ namespace Gomoku
 
         private void OnPlayerWin(CellState player)
         {
-            MessageBox.Show(player.ToString().ToUpper() + " win !" + "\n" + "Press new game to continue", "Game Over",
-                MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            string winner = "";
+            if (cbGameMode.SelectedIndex == 2)
+                winner = gomoku.activePlayer.ToString();
+
+            if (cbGameMode.SelectedIndex == 3)
+            {
+                if (gomoku.activePlayer == CellState.black)
+                    winner = "Congratulation you";
+                else
+                    winner = "Too bad! Machine";
+            }
+
+            if(cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
+            {
+                if (gomoku.activePlayer == CellState.black)
+                    winner = "Congratulation you";
+                else
+                    winner = "Too bad! Machine";
+            }
+            MessageBox.Show(winner.ToString().ToUpper() + " WIN!!!" + "\n" + "Press new game to start a new game.", "Game Over",
+                               MessageBoxButton.OK, MessageBoxImage.Asterisk);
+
             cvChessBoard.IsEnabled = false;
             
         }
@@ -53,6 +73,12 @@ namespace Gomoku
         {
             if(cvChessBoard.Children.Count !=0)
                 gomoku.UpdateChessBoard(cvChessBoard);
+        }
+
+        private void cvChessBoard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (cbGameMode.SelectedIndex == 3)
+                AICalculateNextPoint();
         }
 
         private void NewGame(int mode)
@@ -118,10 +144,5 @@ namespace Gomoku
             AIPos = AI.SelectBestCell(gomoku.activePlayer);
         }
 
-        private void cvChessBoard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (cbGameMode.SelectedIndex == 3)
-                AICalculateNextPoint();
-        }
     }
 }
