@@ -117,7 +117,7 @@ namespace Gomoku
             NewGame(cbGameMode.SelectedIndex);
         }
 
-
+        #region Background Worker
         private void AICalculateNextPoint()
         {
             BackgroundWorker worker = new BackgroundWorker();
@@ -144,5 +144,21 @@ namespace Gomoku
             AIPos = AI.SelectBestCell(gomoku.activePlayer);
         }
 
+        #endregion
+
+
+        private void btnSendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbGameMode.SelectedIndex == 2 || cbGameMode.SelectedIndex == 3)
+            {
+                TextBlock mess = new TextBlock();
+                string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
+                string user = "Guest:\n";
+                mess.Text = date + user + tbMessage.Text + "\n";   //"\n-------------------------------------";
+                mess.TextWrapping = TextWrapping.Wrap;
+                spChatBox.Children.Add(mess);
+                scrvChatBox.ScrollToEnd();
+            }
+        }
     }
 }
