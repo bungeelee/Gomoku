@@ -165,7 +165,7 @@ namespace Gomoku.ViewModels
             chessBoard.Children[chessManPos] = temp;
         }
 
-        public bool PlayAt(Canvas chessBoard, Point pos)
+        public void PlayAt(Canvas chessBoard, Point pos)
         {
             double x = chessBoard.ActualWidth / gameSize;
             double y = chessBoard.ActualHeight / gameSize;
@@ -184,10 +184,10 @@ namespace Gomoku.ViewModels
                 else activePlayer = CellState.black;
                // return 
             }
-            return true;
+            //return true;
         }
 
-        public bool PlayAt(Canvas chessBoard, int row, int col)
+        public void PlayAt(Canvas chessBoard, int row, int col)
         {
             if (board.GetChessman(row, col) == CellState.none)
             {
@@ -198,13 +198,10 @@ namespace Gomoku.ViewModels
                 if (activePlayer == CellState.black)
                     activePlayer = CellState.red;
                 else activePlayer = CellState.black;
-                //return 
             }
-            return false;
+            //return false;
 
         }
-
-
 
     }
 }
