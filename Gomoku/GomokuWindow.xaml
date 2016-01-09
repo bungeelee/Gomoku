@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <!--#region Chess board-->
         <Border BorderThickness="2"  BorderBrush="#FF598CBF" Margin="15,15,5,15">
-            <Canvas x:Name="cvChessBoard" Background="#FF598CBF" Margin="0" SizeChanged="chessBoard_SizeChanged" MouseLeftButtonDown="cvChessBoard_MouseLeftButtonDown"/>
+            <Canvas x:Name="cvChessBoard" Background="#FF598CBF" IsEnabled="False" Margin="0" SizeChanged="chessBoard_SizeChanged" MouseLeftButtonDown="cvChessBoard_MouseLeftButtonDown" MouseLeftButtonUp="cvChessBoard_MouseLeftButtonUp"/>
         </Border>
         <!--#endregion-->
 
