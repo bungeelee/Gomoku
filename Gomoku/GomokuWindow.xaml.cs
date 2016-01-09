@@ -22,13 +22,13 @@ namespace Gomoku
     /// </summary>
     public partial class GomokuWindow : Window
     {
-        GomokuOffline gomoku;
+        //GomokuOffline gomokuOffline;
+        GomokuGame gomoku;
+
         public GomokuWindow()
         {
             InitializeComponent();
-            gomoku = new GomokuOffline();
-            gomoku.DrawChessBoard(cvChessBoard);
-            gomoku.OnPlayerWin += OnPlayerWin;
+            NewGame(cbGameMode.SelectedIndex);
         }
 
         private void OnPlayerWin(CellState player)
@@ -45,9 +45,38 @@ namespace Gomoku
         private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if(cvChessBoard.Children.Count !=0)
+                //gomokuOffline.UpdateChessBoard(cvChessBoard);
                 gomoku.UpdateChessBoard(cvChessBoard);
         }
 
+        private void NewGame(int mode)
+        {
+            switch (mode)
+            {
+                //online
+                case 0: //Player vs player
 
+                    break;
+                case 1: //Player vs machine
+                    break;
+
+                //offline
+                case 2: //Player vs player
+                    gomoku = new GomokuOffline();
+                    gomoku.DrawChessBoard(cvChessBoard);
+                    gomoku.OnPlayerWin += OnPlayerWin;
+                    break;
+                case 3: //Machine vs player
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        private void btnNewGame_Click(object sender, RoutedEventArgs e)
+        {
+            NewGame(cbGameMode.SelectedIndex);
+        }
     }
 }

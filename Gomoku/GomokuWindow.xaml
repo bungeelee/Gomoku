@@ -19,12 +19,12 @@
 
         <!--#region Game mode-->
         <ComboBox x:Name="cbGameMode" Grid.Column="1" SelectedIndex="0" Height="25" Margin="15,15,138,0" VerticalContentAlignment="Center" VerticalAlignment="Top">
-            <ComboBoxItem Content="Online || player vs player" />
-            <ComboBoxItem Content="Online || machine vs player" />
-            <ComboBoxItem Content="Offline || player vs player" />
-            <ComboBoxItem Content="Offline || player vs machine" />
+            <ComboBoxItem Content="Online # Player vs Player" />
+            <ComboBoxItem Content="Online # Machine vs Player" />
+            <ComboBoxItem Content="Offline # Player vs Player" />
+            <ComboBoxItem Content="Offline # Player vs Machine" />
         </ComboBox>
-        <Button x:Name="btnNewGame" Content="New Game" Grid.Column="1" HorizontalAlignment="Right" Margin="0,15,15,0" VerticalAlignment="Top" Width="92" Height="25" Background="#FF598CBF" BorderBrush="#FF598CBF" Foreground="White"/>
+        <Button x:Name="btnNewGame" Content="New Game" Grid.Column="1" HorizontalAlignment="Right" Margin="0,15,15,0" VerticalAlignment="Top" Width="92" Height="25" Background="#FF598CBF" BorderBrush="#FF598CBF" Foreground="White" Click="btnNewGame_Click"/>
         <TextBox x:Name="textBox" Grid.Column="1" Height="25" Margin="15,55,138,0" TextWrapping="Wrap" Text="Guest" VerticalAlignment="Top" VerticalContentAlignment="Center" BorderThickness="0,0,0,2" BorderBrush="#FF598CBF"/>
         <Button x:Name="btnChangeName" Content="Change Name" Grid.Column="1" HorizontalAlignment="Right" Margin="0,55,15,0" VerticalAlignment="Top" Width="92" Height="25" Background="#FF598CBF" BorderBrush="#FF598CBF" Foreground="White"/>
         <Rectangle Grid.Column="1" Height="35" Margin="15,108,15,0" Fill="#FF598CBF" VerticalAlignment="Top" Stroke="#FF598CBF"/>

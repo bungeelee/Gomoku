@@ -18,6 +18,24 @@ namespace Gomoku.ViewModels
         public CellState activePlayer;
         public bool isGameEnded { get; set; }
 
+        public event PlayerWinHandler OnPlayerWin;
+        public delegate void PlayerWinHandler(CellState player);
+
+        public bool WinnerChecker(int row, int col)
+        {
+            if (board.CountPlayerItem(row, col, 1, 0, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 0, 1, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 1, 1, activePlayer) >= 5
+                    || board.CountPlayerItem(row, col, 1, -1, activePlayer) >= 5)
+            {
+                if (OnPlayerWin != null)
+                    OnPlayerWin(player: activePlayer);
+                return true;
+            }
+                return false;
+        }
+
+
         /// <summary>
         /// Draw chess board
         /// </summary>

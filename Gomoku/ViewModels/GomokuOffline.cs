@@ -14,8 +14,8 @@ namespace Gomoku.ViewModels
     public class GomokuOffline: GomokuGame
     {
 
-        public event PlayerWinHandler OnPlayerWin;
-        public delegate void PlayerWinHandler(CellState player);
+        //public event PlayerWinHandler OnPlayerWin;
+        //public delegate void PlayerWinHandler(CellState player);
 
 
         public GomokuOffline()
@@ -46,16 +46,8 @@ namespace Gomoku.ViewModels
             {
                 DrawChessman(chessBoard, (int)row, (int)col);
                 board.SetChessman(activePlayer, (int)row, (int)col);
+                return WinnerChecker((int)row, (int)col);
 
-                if (board.CountPlayerItem((int)row, (int)col, 1, 0, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 0, 1, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 1, 1, activePlayer) >= 5
-                    || board.CountPlayerItem((int)row, (int)col, 1, -1, activePlayer) >= 5)
-                {
-                    if (OnPlayerWin != null)
-                        OnPlayerWin(player: activePlayer);
-                    return true;
-                }
                 //Change turn to next player
                 if (activePlayer == CellState.black)
                     activePlayer = CellState.red;
@@ -72,15 +64,8 @@ namespace Gomoku.ViewModels
                 DrawChessman(chessBoard, row, col);
 
                 board.SetChessman(activePlayer, row, col);
-                if (board.CountPlayerItem(row, col, 1, 0, activePlayer) >= 5
-                    || board.CountPlayerItem(row, col, 0, 1, activePlayer) >= 5
-                    || board.CountPlayerItem(row, col, 1, 1, activePlayer) >= 5
-                    || board.CountPlayerItem(row, col, 1, -1, activePlayer) >= 5)
-                {
-                    if (OnPlayerWin != null)
-                        OnPlayerWin(player: activePlayer);
-                    return true;
-                }
+                return WinnerChecker(row, col);
+
                 //change turn to next player
                 if (activePlayer == CellState.black)
                     activePlayer = CellState.red;
