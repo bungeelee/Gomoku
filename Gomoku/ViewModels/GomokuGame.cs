@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace Gomoku.ViewModels
 {
-    public abstract class GomokuGame
+    public class GomokuGame
     {
         public int gameSize { get; set; }
         public ChessBoard board { get; set; }
@@ -21,6 +21,21 @@ namespace Gomoku.ViewModels
         public event PlayerWinHandler OnPlayerWin;
         public delegate void PlayerWinHandler(CellState player);
 
+        public GomokuGame()
+        {
+            this.gameSize = 12;
+            board = new ChessBoard(gameSize);
+            activePlayer = CellState.black;
+        }
+
+        public GomokuGame(int gameSize)
+        {
+            this.gameSize = gameSize;
+            board = new ChessBoard(gameSize);
+            activePlayer = CellState.black;
+        }
+
+        //Delegate for the winner
         public bool WinnerChecker(int row, int col)
         {
             if (board.CountPlayerItem(row, col, 1, 0, activePlayer) >= 5
@@ -150,9 +165,44 @@ namespace Gomoku.ViewModels
             chessBoard.Children[chessManPos] = temp;
         }
 
-        public abstract bool PlayAt(Canvas chesboard, Point pos);
+        public bool PlayAt(Canvas chessBoard, Point pos)
+        {
+            double x = chessBoard.ActualWidth / gameSize;
+            double y = chessBoard.ActualHeight / gameSize;
 
-        public abstract bool PlayAt(Canvas chessBoard, int X, int Y);
+            double row = pos.X / x;
+            double col = pos.Y / y;
+
+            if (board.GetChessman((int)row, (int)col) == CellState.none)
+            {
+                DrawChessman(chessBoard, (int)row, (int)col);
+                board.SetChessman(activePlayer, (int)row, (int)col);
+                //Change turn to next player
+                WinnerChecker((int)row, (int)col);
+                if (activePlayer == CellState.black)
+                    activePlayer = CellState.red;
+                else activePlayer = CellState.black;
+               // return 
+            }
+            return true;
+        }
+
+        public bool PlayAt(Canvas chessBoard, int row, int col)
+        {
+            if (board.GetChessman(row, col) == CellState.none)
+            {
+                DrawChessman(chessBoard, row, col);
+                board.SetChessman(activePlayer, row, col);
+                WinnerChecker(row, col);
+                //change turn to next player
+                if (activePlayer == CellState.black)
+                    activePlayer = CellState.red;
+                else activePlayer = CellState.black;
+                //return 
+            }
+            return false;
+
+        }
 
 
 

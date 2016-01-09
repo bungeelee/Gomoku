@@ -34,7 +34,6 @@ namespace Gomoku
         private void OnPlayerWin(CellState player)
         {
             MessageBox.Show(player.ToString() + " win !");
-            //throw new NotImplementedException();
         }
 
         private void cvChessBoard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -45,12 +44,12 @@ namespace Gomoku
         private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if(cvChessBoard.Children.Count !=0)
-                //gomokuOffline.UpdateChessBoard(cvChessBoard);
                 gomoku.UpdateChessBoard(cvChessBoard);
         }
 
         private void NewGame(int mode)
         {
+            cvChessBoard.Children.Clear();
             switch (mode)
             {
                 //online
@@ -62,7 +61,7 @@ namespace Gomoku
 
                 //offline
                 case 2: //Player vs player
-                    gomoku = new GomokuOffline();
+                    gomoku = new GomokuGame();
                     gomoku.DrawChessBoard(cvChessBoard);
                     gomoku.OnPlayerWin += OnPlayerWin;
                     break;
