@@ -162,7 +162,8 @@ namespace Gomoku
                 spChatBox.Children.Add(mess);
             }
             else
-                socket.Emit("ChatMessage", tbMessage.Text);
+                if(gomoku != null)
+                    socket.Emit("ChatMessage", tbMessage.Text);
             scrvChatBox.ScrollToEnd();
         }
 
