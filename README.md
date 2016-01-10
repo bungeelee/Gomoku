@@ -14,5 +14,7 @@
 * Auto resize cell when windows resize
 * Change game server using App.config
 
+#### About AI
+I'm using an algorithm found on the internet
 
 
