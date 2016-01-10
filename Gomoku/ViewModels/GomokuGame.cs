@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace Gomoku.ViewModels
 {
-    public abstract class GomokuGame
+    public class GomokuGame
     {
         public int gameSize { get; set; }
         public ChessBoard board { get; set; }
@@ -202,9 +202,6 @@ namespace Gomoku.ViewModels
             //return false;
 
         }
-
-        //PlayAt for online player
-        public abstract void OnlineUserPlayPlayAt(Canvas chessBoard, int row, int col);
 
     }
 }

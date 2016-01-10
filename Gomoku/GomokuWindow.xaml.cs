@@ -89,20 +89,20 @@ namespace Gomoku
             {
                 //online
                 case 0: //Player vs player
-                    gomoku = new GomokuOnline();
+                   // gomoku = new GomokuOnline();
                     
                     break;
-                case 1: //Player vs machine
+                case 1: //Machine vs player Auto play
                     break;
 
                 //offline
                 case 2: //Player vs player
-                    gomoku = new GomokuOffline();
+                    gomoku = new GomokuGame();
                     gomoku.DrawChessBoard(cvChessBoard);
                     gomoku.OnPlayerWin += OnPlayerWin;
                     break;
-                case 3: //Machine vs player
-                    gomoku = new GomokuOffline();
+                case 3: //Player vs machine
+                    gomoku = new GomokuGame();
                     gomoku.DrawChessBoard(cvChessBoard);
                     gomoku.OnPlayerWin += OnPlayerWin;
                     AI = new SimpleMachine(gomoku.board, gomoku.gameSize);
