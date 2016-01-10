@@ -12,13 +12,22 @@ using Gomoku.Models;
 
 namespace Gomoku.ViewModels
 {
-    public class GomokuOnline
+    public class GomokuOnline : GomokuGame
     {
         private Socket socket;
-        //public string playerName { get; set; }
+        public string playerName { get; set; }
         private GomokuGame gomoku;
 
-        public void StartGame(StackPanel chatBox, string playerName, Canvas chessBoard)
+        public GomokuOnline()
+        {
+            playerName = "Guest";
+        }
+
+        public GomokuOnline(string name)
+        {
+            playerName = name;
+        }
+        public void StartGame(StackPanel chatBox, Canvas chessBoard)
         {
             var server = ConfigurationManager.ConnectionStrings["serverIP"].ConnectionString;
             socket = IO.Socket(server);
@@ -43,7 +52,7 @@ namespace Gomoku.ViewModels
             chat.Text = message;
             chatBox.Children.Add(chat);
 
-            string from = null;
+            string fromA = null;
             string mess = null;
             socket.On("ChatMessage", (data) =>
             {
@@ -54,12 +63,13 @@ namespace Gomoku.ViewModels
                 }
 
                 var dt = JObject.Parse(data.ToString());
-                from = (string)dt["from"];
-                if (from == null)
-                    from = "Server";
+                fromA = (string)dt["from"];
+                if (fromA == null)
+                    fromA = "Server";
                 mess = (string)dt["message"];
             });
-
+            chat.Text = fromA + ": " + mess;
+            chatBox.Children.Add(chat);
             socket.On(Socket.EVENT_ERROR, (data) =>
             {
 
