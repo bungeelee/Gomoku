@@ -29,7 +29,7 @@
         <Button x:Name="btnChangeName" Content="Change Name" Grid.Column="1" HorizontalAlignment="Right" Margin="0,55,15,0" VerticalAlignment="Top" Width="92" Height="25" Background="#FF598CBF" BorderBrush="#FF598CBF" Foreground="White" Click="btnChangeName_Click"/>
         <Rectangle Grid.Column="1" Height="35" Margin="15,108,15,0" Fill="#FF598CBF" VerticalAlignment="Top" Stroke="#FF598CBF"/>
         <Label x:Name="label" Content="Message" Grid.Column="1" Margin="15,108,15,0" Height="35" FontSize="18.667" VerticalContentAlignment="Center" Foreground="White" VerticalAlignment="Top"/>
-        <TextBox x:Name="tbMessage" Grid.Column="1" Height="25" Margin="15,0,138,15" TextWrapping="Wrap" Text="Input your message here" VerticalAlignment="Bottom" VerticalContentAlignment="Center" BorderThickness="0,0,0,2" BorderBrush="#FF598CBF"/>
+        <TextBox x:Name="tbMessage" Grid.Column="1" Height="25" Margin="15,0,138,15" TextWrapping="Wrap" Text="Input your message here..." VerticalAlignment="Bottom" VerticalContentAlignment="Center" BorderThickness="0,0,0,2" BorderBrush="#FF598CBF" MouseDown="tbMessage_MouseDown"/>
         <Button x:Name="btnSendMessage" Content="Send" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,15,15" VerticalAlignment="Bottom" Width="92" Height="25" Background="#FF598CBF" BorderBrush="#FF598CBF" Foreground="White" Click="btnSendMessage_Click"/>
         <Border Grid.Column="1" BorderBrush="#FF598CBF" BorderThickness="2" Margin="15,142,15,61">
             <ScrollViewer x:Name="scrvChatBox" VerticalScrollBarVisibility="Auto">

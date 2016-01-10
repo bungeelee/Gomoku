@@ -42,6 +42,7 @@ namespace Gomoku
         private void OnPlayerWin(CellState player)
         {
             string winner = "";
+            string isWin = " win!!!";
             if (cbGameMode.SelectedIndex == 2)
                 winner = gomoku.activePlayer.ToString();
 
@@ -50,7 +51,7 @@ namespace Gomoku
                 if (gomoku.activePlayer == CellState.black)
                     winner = "Congratulation you";
                 else
-                    winner = "Too bad! Machine";
+                    winner = "Sorry! Machine";
             }
 
             if (cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
@@ -58,9 +59,12 @@ namespace Gomoku
                 if (gomoku.activePlayer == CellState.black)
                     winner = "Congratulation you";
                 else
-                    winner = "Too bad! Machine";
+                {
+                    winner = "Sorry! you";
+                    isWin = " lose!!!";
+                }
             }
-            MessageBox.Show(winner.ToString().ToUpper() + " WIN!!!" + "\n" + "Press new game to start a new game.", "Game Over",
+            MessageBox.Show(winner.ToString() + isWin + "\n" + "Press new game to start a new game.", "Game Over",
                                MessageBoxButton.OK, MessageBoxImage.Asterisk);
 
             cvChessBoard.IsEnabled = false;
@@ -91,7 +95,7 @@ namespace Gomoku
 
                     }
                 }
-             }
+            }
 
         }
 
@@ -101,8 +105,8 @@ namespace Gomoku
             {
                 if (gomoku != null)
                     gomoku.UpdateChessBoard(cvChessBoard);
-                
-                
+
+
             }
         }
 
@@ -157,10 +161,9 @@ namespace Gomoku
                 TextBlock mess = new TextBlock();
                 string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
                 string user = "Guest:\n";
-                mess.Text = date + user + tbMessage.Text + "\n"; 
+                mess.Text = date + user + tbMessage.Text + "\n";
                 mess.TextWrapping = TextWrapping.Wrap;
                 spChatBox.Children.Add(mess);
-                scrvChatBox.ScrollToEnd();
             }
             else
                 socket.Emit("ChatMessage", tbMessage.Text);
@@ -219,7 +222,7 @@ namespace Gomoku
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     TextBlock chat = new TextBlock();
-                    chat.Text = "Conneted";
+                    chat.Text = ">>>>>>>>>>>> Conneted. Start New Game <<<<<<<<<<<<\n";
                     spChatBox.Children.Add(chat);
                 }));
             });
@@ -285,6 +288,10 @@ namespace Gomoku
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    TextBlock chat = new TextBlock();
+                    chat.TextWrapping = TextWrapping.Wrap;
+                    chat.Text = ">>>>>>>> Game over. Press New Game to start new game\n";
+                    spChatBox.Children.Add(chat);
                 }));
             });
         }
@@ -293,35 +300,35 @@ namespace Gomoku
         {
             string name = null;
             string mess = null;
-            int count = data.Children().Count();
-            if (count == 0 || count == 1)
+            try
             {
-                name = "Server";
+                name = data["from"].ToString();
+                
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                if (name == null)
+                    name = "Server";
                 mess = data["message"].ToString();
+                int indexbr = mess.IndexOf("<br />");
+                if(indexbr!=-1)
+                    mess = mess.Insert(indexbr + 6, " ").Remove(indexbr, 6);
             }
-            else
-            {
-                try {
-                    name = data["from"].ToString();
-                }
-                catch
-                {
-
-                }
-                finally
-                {
-                    if (name == null)
-                        name = "Server";
-                    mess = data["message"].ToString();
-                }
-            }
-
             TextBlock chat = new TextBlock();
             chat.TextWrapping = TextWrapping.Wrap;
             string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
             chat.Text = date + name + ":\n>>> " + mess + "\n";
             spChatBox.Children.Add(chat);
             scrvChatBox.ScrollToEnd();
+        }
+
+        private void tbMessage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            tbMessage.Text = "";
         }
     }
 }
