@@ -16,6 +16,9 @@ using Gomoku.Models;
 using Gomoku.ViewModels;
 using System.ComponentModel;
 using System.Threading;
+using Quobject.SocketIoClientDotNet.Client;
+using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace Gomoku
 {
@@ -28,6 +31,8 @@ namespace Gomoku
         GomokuGame gomoku;
         Machine AI;
         Point AIPos;
+        Socket socket;
+        Point myStep;
 
         public GomokuWindow()
         {
@@ -48,7 +53,7 @@ namespace Gomoku
                     winner = "Too bad! Machine";
             }
 
-            if(cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
+            if (cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
             {
                 if (gomoku.activePlayer == CellState.black)
                     winner = "Congratulation you";
@@ -59,20 +64,50 @@ namespace Gomoku
                                MessageBoxButton.OK, MessageBoxImage.Asterisk);
 
             cvChessBoard.IsEnabled = false;
-            
+
         }
 
         private void cvChessBoard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-           // if(gomoku.activePlayer == CellState.black)
+            if (cbGameMode.SelectedIndex == 2 || cbGameMode.SelectedIndex == 3)
                 gomoku.PlayAt(cvChessBoard, e.GetPosition(cvChessBoard));
-            
+            else
+            {
+                if (cbGameMode.SelectedIndex == 0)
+                {// online.MyStepIs(cvChessBoard, e.GetPosition(cvChessBoard));
+                    {
+                        myStep = new Point();
+                        double x = cvChessBoard.ActualWidth / 12;
+                        double y = cvChessBoard.ActualHeight / 12;
+
+                        if (cbGameMode.SelectedIndex == 0)
+                        {
+                            myStep.X = e.GetPosition(cvChessBoard).X / x;
+                            myStep.Y = e.GetPosition(cvChessBoard).Y / y;
+                        }
+                        else
+                        {
+
+                        }
+                        //mouseDownded = true;
+                        socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)myStep.X, col = (int)myStep.Y }));
+
+
+                    }
+                }
+             }
+
         }
 
         private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if(cvChessBoard.Children.Count !=0)
-                gomoku.UpdateChessBoard(cvChessBoard);
+            if (cvChessBoard.Children.Count != 0)
+            {
+                if (gomoku != null)
+                    gomoku.UpdateChessBoard(cvChessBoard);
+                
+                
+            }
         }
 
         private void cvChessBoard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -88,9 +123,8 @@ namespace Gomoku
             switch (mode)
             {
                 //online
-                case 0: //Player vs player
-                   // gomoku = new GomokuOnline();
-                    
+                case 0:
+                    NewOnlineGame();
                     break;
                 case 1: //Machine vs player Auto play
                     break;
@@ -113,6 +147,11 @@ namespace Gomoku
 
         }
 
+        private void Online_OnPlayerWin(CellState player)
+        {
+            throw new NotImplementedException();
+        }
+
         private void btnNewGame_Click(object sender, RoutedEventArgs e)
         {
             NewGame(cbGameMode.SelectedIndex);
@@ -130,6 +169,9 @@ namespace Gomoku
                 spChatBox.Children.Add(mess);
                 scrvChatBox.ScrollToEnd();
             }
+            else
+                //online.SendMessage(tbMessage.Text);
+                socket.Emit("ChatMessage", tbMessage.Text);
         }
 
 
@@ -160,8 +202,107 @@ namespace Gomoku
             AIPos = AI.SelectBestCell(gomoku.activePlayer);
         }
 
+
         #endregion
 
+        private void btnChangeName_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
+                //online.ChangeName(tbName.Text);
+                socket.Emit("MyNameIs", tbName.Text);
+        }
 
+        //Online 
+        private void NewOnlineGame()
+        {
+            var server = ConfigurationManager.ConnectionStrings["serverIP"].ConnectionString;
+            socket = IO.Socket(server);
+            gomoku = new GomokuGame();
+            gomoku.DrawChessBoard(cvChessBoard);
+            gomoku.OnPlayerWin += OnPlayerWin;
+
+            socket.On(Socket.EVENT_CONNECT, () =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    TextBlock chat = new TextBlock();
+                    chat.Text = "Conneted";
+                    spChatBox.Children.Add(chat);
+                }));
+            });
+
+            socket.On(Socket.EVENT_MESSAGE, (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    TextBlock chat = new TextBlock();
+                    chat.TextWrapping = TextWrapping.Wrap;
+                    chat.Text = JObject.Parse(data.ToString()).ToString();
+                    spChatBox.Children.Add(chat);
+                }));
+            });
+
+            socket.On(Socket.EVENT_CONNECT_ERROR, (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    TextBlock chat = new TextBlock();
+                    chat.TextWrapping = TextWrapping.Wrap;
+                    chat.Text = JObject.Parse(data.ToString()).ToString();
+                    spChatBox.Children.Add(chat);
+                }));
+            });
+
+            socket.On("ChatMessage", (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    if (((JObject)data)["message"].ToString() == "Welcome!")
+                    {
+                        socket.Emit("MyNameIs", tbName.Text);
+                        socket.Emit("ConnectToOtherPlayer");
+                    }
+                    //var dt = JObject.Parse(data.ToString());
+                    TextBlock chat = new TextBlock();
+                    chat.TextWrapping = TextWrapping.Wrap;
+                    chat.Text = JObject.Parse(data.ToString()).ToString();
+                    spChatBox.Children.Add(chat);
+                }));
+            });
+
+            socket.On(Socket.EVENT_ERROR, (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    TextBlock chat = new TextBlock();
+                    chat.TextWrapping = TextWrapping.Wrap;
+                    chat.Text = JObject.Parse(data.ToString()).ToString();
+                    spChatBox.Children.Add(chat);
+                }));
+            });
+
+            socket.On("NextStepIs", (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    var o = JObject.Parse(data.ToString());
+                    //player2.X = (double)o["row"];
+                    //player2.Y = (double)o["col"];
+
+                    if ((int)o["player"] == 1)
+                    {
+                        gomoku.activePlayer = CellState.red;
+                        gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
+                    }
+
+                    if ((int)o["player"] == 0)
+                    {
+                        gomoku.activePlayer = CellState.black;
+                        gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
+                    }
+                }));
+            });
+
+        }
     }
 }
