@@ -32,7 +32,7 @@ namespace Gomoku
         Machine AI;
         Point AIPos;
         Socket socket;
-        Point myStep;
+        bool isGameEnded = false;
 
         public GomokuWindow()
         {
@@ -41,6 +41,7 @@ namespace Gomoku
 
         private void OnPlayerWin(CellState player)
         {
+            isGameEnded = true;
             string winner = "";
             string isWin = " win!!!";
             if (cbGameMode.SelectedIndex == 2)
@@ -78,9 +79,9 @@ namespace Gomoku
             else
             {
                 if (cbGameMode.SelectedIndex == 0)
-                {// online.MyStepIs(cvChessBoard, e.GetPosition(cvChessBoard));
+                {
                     {
-                        myStep = new Point();
+                        var myStep = new Point();
                         double x = cvChessBoard.ActualWidth / 12;
                         double y = cvChessBoard.ActualHeight / 12;
 
@@ -91,8 +92,6 @@ namespace Gomoku
                         }
                         //mouseDownded = true;
                         socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)myStep.X, col = (int)myStep.Y }));
-
-
                     }
                 }
             }
@@ -102,12 +101,7 @@ namespace Gomoku
         private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (cvChessBoard.Children.Count != 0)
-            {
-                if (gomoku != null)
                     gomoku.UpdateChessBoard(cvChessBoard);
-
-
-            }
         }
 
         private void cvChessBoard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -127,8 +121,10 @@ namespace Gomoku
                     NewOnlineGame();
                     break;
                 case 1: //Machine vs player Auto play
+                    isGameEnded = false;
+                    cvChessBoard.IsEnabled = false;
+                    NewOnlineGame();
                     break;
-
                 //offline
                 case 2: //Player vs player
                     gomoku = new GomokuGame();
@@ -194,11 +190,8 @@ namespace Gomoku
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //Thread.Sleep(10000);
             AIPos = AI.SelectBestCell(gomoku.activePlayer);
         }
-
-
         #endregion
 
         private void btnChangeName_Click(object sender, RoutedEventArgs e)
@@ -264,17 +257,26 @@ namespace Gomoku
                 }));
             });
 
+            
             socket.On("NextStepIs", (data) =>
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     var o = JObject.Parse(data.ToString());
+                    //Client turn
                     if ((int)o["player"] == 1)
                     {
                         gomoku.activePlayer = CellState.red;
                         gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
-                    }
 
+                        if (cbGameMode.SelectedIndex == 1 && isGameEnded == false)
+                        {
+                            AI = new SimpleMachine(gomoku.board, gomoku.gameSize);
+                            AICalculateNextPoint();
+                            socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)AIPos.X, col = (int)AIPos.Y }));
+                        }
+                    }
+                    //My turn
                     if ((int)o["player"] == 0)
                     {
                         gomoku.activePlayer = CellState.black;
@@ -303,7 +305,6 @@ namespace Gomoku
             try
             {
                 name = data["from"].ToString();
-                
             }
             catch
             {
@@ -318,9 +319,24 @@ namespace Gomoku
                 if(indexbr!=-1)
                     mess = mess.Insert(indexbr + 6, " ").Remove(indexbr, 6);
             }
+
+            #region Random step for Machine vs Player in Online mode
+            if (mess.IndexOf("You are the first player!") != -1 && cbGameMode.SelectedIndex == 1)
+            {
+                DumbMachine a = new DumbMachine();
+                socket.Emit("MyStepIs", JObject.FromObject(new { row = a.RanColOrRow(), col = a.RanColOrRow() }));
+            }
+            if (mess == "Invalid step." && cbGameMode.SelectedIndex == 1 && isGameEnded == false)
+            {
+                DumbMachine a = new DumbMachine();
+                Point next = a.NextStep();
+                socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)next.X, col = (int)next.Y }));
+            }
+            #endregion
+
             TextBlock chat = new TextBlock();
             chat.TextWrapping = TextWrapping.Wrap;
-            string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
+            string date = "# <" + DateTime.Now.ToString("hh:mm:ss tt") + "> ";
             chat.Text = date + name + ":\n>>> " + mess + "\n";
             spChatBox.Children.Add(chat);
             scrvChatBox.ScrollToEnd();
@@ -330,5 +346,7 @@ namespace Gomoku
         {
             tbMessage.Text = "";
         }
+
+        
     }
 }
