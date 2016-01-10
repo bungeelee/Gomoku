@@ -266,9 +266,6 @@ namespace Gomoku
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     var o = JObject.Parse(data.ToString());
-                    //player2.X = (double)o["row"];
-                    //player2.Y = (double)o["col"];
-
                     if ((int)o["player"] == 1)
                     {
                         gomoku.activePlayer = CellState.red;
@@ -282,28 +279,47 @@ namespace Gomoku
                     }
                 }));
             });
-            scrvChatBox.ScrollToEnd();
+
+            socket.On("EndGame", (data) =>
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                }));
+            });
         }
 
         private void AddMessageToChatbox(JObject data)
         {
             string name = null;
             string mess = null;
-            if (data.Children().Count() == 1)
+            int count = data.Children().Count();
+            if (count == 0 || count == 1)
             {
                 name = "Server";
                 mess = data["message"].ToString();
             }
             else
             {
-                name = data["from"].ToString();
-                mess = data["message"].ToString();
+                try {
+                    name = data["from"].ToString();
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    if (name == null)
+                        name = "Server";
+                    mess = data["message"].ToString();
+                }
             }
 
             TextBlock chat = new TextBlock();
             chat.TextWrapping = TextWrapping.Wrap;
             string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
-            chat.Text = date + name + ":\n>> " + mess + "\n";
+            chat.Text = date + name + ":\n>>> " + mess + "\n";
             spChatBox.Children.Add(chat);
             scrvChatBox.ScrollToEnd();
         }
