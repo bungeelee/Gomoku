@@ -147,13 +147,10 @@ namespace Gomoku
 
         }
 
-        private void Online_OnPlayerWin(CellState player)
-        {
-            throw new NotImplementedException();
-        }
 
         private void btnNewGame_Click(object sender, RoutedEventArgs e)
         {
+            spChatBox.Children.Clear();
             NewGame(cbGameMode.SelectedIndex);
         }
 
@@ -164,14 +161,15 @@ namespace Gomoku
                 TextBlock mess = new TextBlock();
                 string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
                 string user = "Guest:\n";
-                mess.Text = date + user + tbMessage.Text + "\n";   //"\n-------------------------------------";
+                mess.Text = date + user + tbMessage.Text + "\n"; 
                 mess.TextWrapping = TextWrapping.Wrap;
                 spChatBox.Children.Add(mess);
                 scrvChatBox.ScrollToEnd();
             }
             else
-                //online.SendMessage(tbMessage.Text);
                 socket.Emit("ChatMessage", tbMessage.Text);
+
+            scrvChatBox.ScrollToEnd();
         }
 
 
@@ -208,9 +206,11 @@ namespace Gomoku
         private void btnChangeName_Click(object sender, RoutedEventArgs e)
         {
             if (cbGameMode.SelectedIndex == 0 || cbGameMode.SelectedIndex == 1)
-                //online.ChangeName(tbName.Text);
-                socket.Emit("MyNameIs", tbName.Text);
+                if (socket != null)
+                    socket.Emit("MyNameIs", tbName.Text);
         }
+
+
 
         //Online 
         private void NewOnlineGame()
@@ -248,7 +248,7 @@ namespace Gomoku
                 {
                     TextBlock chat = new TextBlock();
                     chat.TextWrapping = TextWrapping.Wrap;
-                    chat.Text = JObject.Parse(data.ToString()).ToString();
+                    chat.Text = "Time out!";
                     spChatBox.Children.Add(chat);
                 }));
             });
@@ -302,7 +302,7 @@ namespace Gomoku
                     }
                 }));
             });
-
+            scrvChatBox.ScrollToEnd();
         }
     }
 }
