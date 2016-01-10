@@ -85,10 +85,6 @@ namespace Gomoku
                             myStep.X = e.GetPosition(cvChessBoard).X / x;
                             myStep.Y = e.GetPosition(cvChessBoard).Y / y;
                         }
-                        else
-                        {
-
-                        }
                         //mouseDownded = true;
                         socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)myStep.X, col = (int)myStep.Y }));
 
@@ -168,7 +164,6 @@ namespace Gomoku
             }
             else
                 socket.Emit("ChatMessage", tbMessage.Text);
-
             scrvChatBox.ScrollToEnd();
         }
 
@@ -210,8 +205,6 @@ namespace Gomoku
                     socket.Emit("MyNameIs", tbName.Text);
         }
 
-
-
         //Online 
         private void NewOnlineGame()
         {
@@ -235,10 +228,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    TextBlock chat = new TextBlock();
-                    chat.TextWrapping = TextWrapping.Wrap;
-                    chat.Text = JObject.Parse(data.ToString()).ToString();
-                    spChatBox.Children.Add(chat);
+                    AddMessageToChatbox(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -246,10 +236,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    TextBlock chat = new TextBlock();
-                    chat.TextWrapping = TextWrapping.Wrap;
-                    chat.Text = "Time out!";
-                    spChatBox.Children.Add(chat);
+                    AddMessageToChatbox(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -262,11 +249,7 @@ namespace Gomoku
                         socket.Emit("MyNameIs", tbName.Text);
                         socket.Emit("ConnectToOtherPlayer");
                     }
-                    //var dt = JObject.Parse(data.ToString());
-                    TextBlock chat = new TextBlock();
-                    chat.TextWrapping = TextWrapping.Wrap;
-                    chat.Text = JObject.Parse(data.ToString()).ToString();
-                    spChatBox.Children.Add(chat);
+                    AddMessageToChatbox(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -274,10 +257,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    TextBlock chat = new TextBlock();
-                    chat.TextWrapping = TextWrapping.Wrap;
-                    chat.Text = JObject.Parse(data.ToString()).ToString();
-                    spChatBox.Children.Add(chat);
+                    AddMessageToChatbox(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -302,6 +282,29 @@ namespace Gomoku
                     }
                 }));
             });
+            scrvChatBox.ScrollToEnd();
+        }
+
+        private void AddMessageToChatbox(JObject data)
+        {
+            string name = null;
+            string mess = null;
+            if (data.Children().Count() == 1)
+            {
+                name = "Server";
+                mess = data["message"].ToString();
+            }
+            else
+            {
+                name = data["from"].ToString();
+                mess = data["message"].ToString();
+            }
+
+            TextBlock chat = new TextBlock();
+            chat.TextWrapping = TextWrapping.Wrap;
+            string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
+            chat.Text = date + name + ":\n>> " + mess + "\n";
+            spChatBox.Children.Add(chat);
             scrvChatBox.ScrollToEnd();
         }
     }
