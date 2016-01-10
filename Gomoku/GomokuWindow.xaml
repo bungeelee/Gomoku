@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku"
         mc:Ignorable="d"
-        Title="Gomoku - Five in a row" Height="640" Width="930">
+        Title="Gomoku - Five in a row" Height="640" Width="930" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3.7*" MaxWidth="735"/>

@@ -89,19 +89,20 @@ namespace Gomoku
             {
                 //online
                 case 0: //Player vs player
-
+                    gomoku = new GomokuOnline();
+                    
                     break;
                 case 1: //Player vs machine
                     break;
 
                 //offline
                 case 2: //Player vs player
-                    gomoku = new GomokuGame();
+                    gomoku = new GomokuOffline();
                     gomoku.DrawChessBoard(cvChessBoard);
                     gomoku.OnPlayerWin += OnPlayerWin;
                     break;
                 case 3: //Machine vs player
-                    gomoku = new GomokuGame();
+                    gomoku = new GomokuOffline();
                     gomoku.DrawChessBoard(cvChessBoard);
                     gomoku.OnPlayerWin += OnPlayerWin;
                     AI = new SimpleMachine(gomoku.board, gomoku.gameSize);
@@ -117,7 +118,22 @@ namespace Gomoku
             NewGame(cbGameMode.SelectedIndex);
         }
 
-        #region Background Worker
+        private void btnSendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbGameMode.SelectedIndex == 2 || cbGameMode.SelectedIndex == 3)
+            {
+                TextBlock mess = new TextBlock();
+                string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
+                string user = "Guest:\n";
+                mess.Text = date + user + tbMessage.Text + "\n";   //"\n-------------------------------------";
+                mess.TextWrapping = TextWrapping.Wrap;
+                spChatBox.Children.Add(mess);
+                scrvChatBox.ScrollToEnd();
+            }
+        }
+
+
+        #region Background Worker: Calculate next step
         private void AICalculateNextPoint()
         {
             BackgroundWorker worker = new BackgroundWorker();
@@ -147,18 +163,5 @@ namespace Gomoku
         #endregion
 
 
-        private void btnSendMessage_Click(object sender, RoutedEventArgs e)
-        {
-            if (cbGameMode.SelectedIndex == 2 || cbGameMode.SelectedIndex == 3)
-            {
-                TextBlock mess = new TextBlock();
-                string date = "# <" + DateTime.Now.ToString("hh:mm:ss") + "> ";
-                string user = "Guest:\n";
-                mess.Text = date + user + tbMessage.Text + "\n";   //"\n-------------------------------------";
-                mess.TextWrapping = TextWrapping.Wrap;
-                spChatBox.Children.Add(mess);
-                scrvChatBox.ScrollToEnd();
-            }
-        }
     }
 }

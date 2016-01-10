@@ -72,8 +72,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\GomokuOffline.cs" />
     <Compile Include="Models\DumbMachine.cs" />
     <Compile Include="ViewModels\GomokuGame.cs" />
+    <Compile Include="ViewModels\GomokuOnline.cs" />
     <Page Include="GomokuWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
