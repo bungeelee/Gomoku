@@ -33,6 +33,8 @@ namespace Gomoku
         Point AIPos;
         Socket socket;
         bool isGameEnded = false;
+        bool isValidStep = false;
+
 
         public GomokuWindow()
         {
@@ -101,7 +103,7 @@ namespace Gomoku
         private void chessBoard_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (cvChessBoard.Children.Count != 0)
-                    gomoku.UpdateChessBoard(cvChessBoard);
+                gomoku.UpdateChessBoard(cvChessBoard);
         }
 
         private void cvChessBoard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -124,6 +126,7 @@ namespace Gomoku
                     isGameEnded = false;
                     cvChessBoard.IsEnabled = false;
                     NewOnlineGame();
+                    AI = new SimpleMachine(gomoku.board, 12);
                     break;
                 //offline
                 case 2: //Player vs player
@@ -162,8 +165,8 @@ namespace Gomoku
                 spChatBox.Children.Add(mess);
             }
             else
-                if(gomoku != null)
-                    socket.Emit("ChatMessage", tbMessage.Text);
+                if (gomoku != null)
+                socket.Emit("ChatMessage", tbMessage.Text);
             scrvChatBox.ScrollToEnd();
         }
 
@@ -181,7 +184,11 @@ namespace Gomoku
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            gomoku.PlayAt(cvChessBoard, (int)AIPos.X, (int)AIPos.Y);
+            //throw new NotImplementedException();
+            if (cbGameMode.SelectedIndex == 3)
+                gomoku.PlayAt(cvChessBoard, (int)AIPos.X, (int)AIPos.Y);
+            else
+                return;
         }
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -191,6 +198,7 @@ namespace Gomoku
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
+            //Thread.Sleep(10000);
             AIPos = AI.SelectBestCell(gomoku.activePlayer);
         }
         #endregion
@@ -205,7 +213,9 @@ namespace Gomoku
         //Online 
         private void NewOnlineGame()
         {
+            //Get ServerIP
             var server = ConfigurationManager.ConnectionStrings["serverIP"].ConnectionString;
+
             socket = IO.Socket(server);
             gomoku = new GomokuGame();
             gomoku.DrawChessBoard(cvChessBoard);
@@ -225,7 +235,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    ProgressMessage(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -233,7 +243,9 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    TextBlock error = new TextBlock();
+                    error.Text = "Connec error";
+                    spChatBox.Children.Add(error);
                 }));
             });
 
@@ -246,7 +258,7 @@ namespace Gomoku
                         socket.Emit("MyNameIs", tbName.Text);
                         socket.Emit("ConnectToOtherPlayer");
                     }
-                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    ProgressMessage(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -254,11 +266,14 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    TextBlock error = new TextBlock();
+                    error.Text = "Error";
+                    spChatBox.Children.Add(error);
+                    //AddMessageToChatbox(JObject.Parse(data.ToString()));
                 }));
             });
 
-            
+
             socket.On("NextStepIs", (data) =>
             {
                 this.Dispatcher.Invoke((Action)(() =>
@@ -272,7 +287,6 @@ namespace Gomoku
 
                         if (cbGameMode.SelectedIndex == 1 && isGameEnded == false)
                         {
-                            AI = new SimpleMachine(gomoku.board, gomoku.gameSize);
                             AICalculateNextPoint();
                             socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)AIPos.X, col = (int)AIPos.Y }));
                         }
@@ -281,6 +295,7 @@ namespace Gomoku
                     if ((int)o["player"] == 0)
                     {
                         gomoku.activePlayer = CellState.black;
+                        //if (cbGameMode.SelectedIndex != 1)
                         gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
                     }
                 }));
@@ -290,7 +305,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    AddMessageToChatbox(JObject.Parse(data.ToString()));
+                    ProgressMessage(JObject.Parse(data.ToString()));
                     TextBlock chat = new TextBlock();
                     chat.TextWrapping = TextWrapping.Wrap;
                     chat.Text = ">>>>>>>> Game over. Press New Game to start new game\n";
@@ -299,7 +314,7 @@ namespace Gomoku
             });
         }
 
-        private void AddMessageToChatbox(JObject data)
+        private void ProgressMessage(JObject data)
         {
             string name = null;
             string mess = null;
@@ -317,7 +332,7 @@ namespace Gomoku
                     name = "Server";
                 mess = data["message"].ToString();
                 int indexbr = mess.IndexOf("<br />");
-                if(indexbr!=-1)
+                if (indexbr != -1)
                     mess = mess.Insert(indexbr + 6, " ").Remove(indexbr, 6);
             }
 
@@ -327,12 +342,14 @@ namespace Gomoku
                 DumbMachine a = new DumbMachine();
                 socket.Emit("MyStepIs", JObject.FromObject(new { row = a.RanColOrRow(), col = a.RanColOrRow() }));
             }
+            isValidStep = true;
             if (mess == "Invalid step." && cbGameMode.SelectedIndex == 1 && isGameEnded == false)
             {
                 DumbMachine a = new DumbMachine();
-                Point next = a.NextStep();
-                socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)next.X, col = (int)next.Y }));
+                AIPos = a.NextStep();
+                socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)AIPos.X, col = (int)AIPos.Y }));
             }
+
             #endregion
 
             TextBlock chat = new TextBlock();
@@ -348,6 +365,6 @@ namespace Gomoku
             tbMessage.Text = "";
         }
 
-        
+
     }
 }
