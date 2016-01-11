@@ -235,7 +235,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    ProgressMessage(JObject.Parse(data.ToString()));
+                    MessageFilter(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -258,7 +258,7 @@ namespace Gomoku
                         socket.Emit("MyNameIs", tbName.Text);
                         socket.Emit("ConnectToOtherPlayer");
                     }
-                    ProgressMessage(JObject.Parse(data.ToString()));
+                    MessageFilter(JObject.Parse(data.ToString()));
                 }));
             });
 
@@ -309,7 +309,7 @@ namespace Gomoku
             {
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    ProgressMessage(JObject.Parse(data.ToString()));
+                    MessageFilter(JObject.Parse(data.ToString()));
                     TextBlock chat = new TextBlock();
                     chat.TextWrapping = TextWrapping.Wrap;
                     chat.Text = ">>>>>>>> Game over. Press New Game to start new game\n";
@@ -318,7 +318,7 @@ namespace Gomoku
             });
         }
 
-        private void ProgressMessage(JObject data)
+        private void MessageFilter(JObject data)
         {
             string name = null;
             string mess = null;
