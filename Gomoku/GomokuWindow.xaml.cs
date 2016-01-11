@@ -126,7 +126,7 @@ namespace Gomoku
                     isGameEnded = false;
                     cvChessBoard.IsEnabled = false;
                     NewOnlineGame();
-                    AI = new SimpleMachine(gomoku.board, 12);
+                    //AI = new SimpleMachine(gomoku.board, 12);
                     break;
                 //offline
                 case 2: //Player vs player
@@ -284,10 +284,10 @@ namespace Gomoku
                     {
                         gomoku.activePlayer = CellState.red;
                         gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
-
+                        AI = new SimpleMachine(gomoku.board, 12);
+                        AICalculateNextPoint();
                         if (cbGameMode.SelectedIndex == 1 && isGameEnded == false)
                         {
-                            AICalculateNextPoint();
                             socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)AIPos.X, col = (int)AIPos.Y }));
                         }
                     }
@@ -295,7 +295,11 @@ namespace Gomoku
                     if ((int)o["player"] == 0)
                     {
                         gomoku.activePlayer = CellState.black;
-                        //if (cbGameMode.SelectedIndex != 1)
+                        if (cbGameMode.SelectedIndex != 1)
+                        {
+                            AI = new SimpleMachine(gomoku.board, 12);
+                            AICalculateNextPoint();
+                        }
                         gomoku.PlayAt(cvChessBoard, (int)o["row"], (int)o["col"]);
                     }
                 }));
@@ -345,8 +349,8 @@ namespace Gomoku
             isValidStep = true;
             if (mess == "Invalid step." && cbGameMode.SelectedIndex == 1 && isGameEnded == false)
             {
-                DumbMachine a = new DumbMachine();
-                AIPos = a.NextStep();
+                AI = new SimpleMachine(gomoku.board, 12);
+                AICalculateNextPoint();
                 socket.Emit("MyStepIs", JObject.FromObject(new { row = (int)AIPos.X, col = (int)AIPos.Y }));
             }
 
