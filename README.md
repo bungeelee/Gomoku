@@ -1,6 +1,6 @@
 # Gomoku client using C# WPF
 
-### Feture
+### Fetures
 #### Offline
 * Player vs Player the first one is black
 * Machine vs Player
